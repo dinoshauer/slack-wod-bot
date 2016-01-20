@@ -2,8 +2,14 @@ var _ = require('underscore'),
     moment = require('moment'),
     request = require('request').defaults({ encoding: null }),
     pdfText = require('pdf-text');
-var redis = require("redis"),
-    client = redis.createClient();
+
+if (process.env.REDISTOGO_URL) {
+  var rtg   = require("url").parse(process.env.REDISTOGO_URL),
+      redis = require("redis").createClient(rtg.port, rtg.hostname);
+  redis.auth(rtg.auth.split(":")[1]);
+} else {
+  var redis = require("redis").createClient();
+}
 
 var _page_re = /\d+?\saf\s\d+/i,
     _email_re = /.*@crossfitcopenhagen.dk/i,
