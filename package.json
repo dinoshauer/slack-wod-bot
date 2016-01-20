@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "botkit": "0.0.5",
     "hiredis": "^0.4.1",
     "moment": "^2.11.1",
     "pdf-text": "^0.4.0",
