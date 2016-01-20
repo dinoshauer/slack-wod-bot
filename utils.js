@@ -4,11 +4,11 @@ var _ = require('underscore'),
     pdfText = require('pdf-text');
 
 if (process.env.REDISTOGO_URL) {
-  var rtg   = require("url").parse(process.env.REDISTOGO_URL),
-      redis = require("redis").createClient(rtg.port, rtg.hostname);
-  redis.auth(rtg.auth.split(":")[1]);
+  var rtg   = require('url').parse(process.env.REDISTOGO_URL),
+      client = require('redis').createClient(rtg.port, rtg.hostname);
+  redis.auth(rtg.auth.split(':')[1]);
 } else {
-  var redis = require("redis").createClient();
+  var client = require('redis').createClient();
 }
 
 var _page_re = /\d+?\saf\s\d+/i,
