@@ -18,6 +18,8 @@ Currently listening for these patterns:
 * `wod today`
 * `wod yesterday`
 * `wod tomorrow`
+* `wod next (mon|tues|wednes|thurs|fri|satur|sun)day\??`
+* `wods next week\??`
 
 [0]: http://howdy.ai/botkit/
 [1]: http://crossfitcopenhagen.dk

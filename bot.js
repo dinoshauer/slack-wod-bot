@@ -2,6 +2,8 @@ var Botkit = require('botkit'),
     moment = require('moment'),
     utils = require('./utils');
 
+require('moment-range');
+
 if (!process.env.SLACK_API_KEY) {
     console.log('Error: Specify SLACK_API_KEY in environment');
     process.exit(1);
@@ -58,10 +60,6 @@ controller.hears(
   ['new wod list here: <(.*)>'],
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {
-    // do something to respond to message
-    // all of the fields available in a normal Slack message object are available
-    // https://api.slack.com/events/message
-
     bot.startConversation(message, function (error, convo) {
       convo.sayFirst('Great! I\'m going to download the list @ ' + message.match[1]);
       utils.downloadPdf(message.match[1], function (err, res) {
@@ -154,5 +152,50 @@ controller.hears(
       } else {
         bot.reply(message, 'There are no wods for yesterday in my head :o');
       }
+    });
+});
+
+controller.hears(
+  ['wod next (mon|tues|wednes|thurs|fri|satur|sun)day\??'],
+  ['direct_message', 'direct_mention', 'mention', 'ambient'],
+  function (bot, message) {
+    var start = moment().startOf('day').add(1, 'week'),
+        target = start.day(message.match[1]).toISOString();
+    console.log(message);
+
+    utils.getWod(target, function (err, res) {
+      if (err) {
+        console.log(err);
+        bot.reply('I couldn\'t get a wod for next ' + message.match[1] + 'day :(');
+      }
+      if (res.length !== 0) {
+        bot.reply(message, res.join('\n'));
+      } else {
+        bot.reply(message, 'There are no wods for next ' + message.match[1] + 'day in my head :o');
+      }
+    });
+});
+
+controller.hears(
+  ['wods next week\??'],
+  ['direct_message', 'direct_mention', 'mention', 'ambient'],
+  function (bot, message) {
+    var start = moment().add(1, 'week').startOf('week'),
+        end = moment().add(1, 'week').endOf('week'),
+        targets = moment.range(start, end);
+    console.log(message);
+
+    targets.by('days', function (target) {
+      utils.getWod(target.toISOString(), function (err, res) {
+        if (err) {
+          console.log(err);
+          bot.reply('I couldn\'t get a wod for next week :(');
+        }
+        if (res.length !== 0) {
+          bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
+        } else {
+          bot.reply(message, 'There are no wods for next week in my head :o');
+        }
+      });
     });
 });

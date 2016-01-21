@@ -18,8 +18,6 @@ var _page_re = /\d+?\saf\s\d+/i,
     _header_re = /WOD kalender .*/;
 
 
-moment.locale('da');
-
 function _isContent(item) {
   return !_page_re.test(item) &&
          !_email_re.test(item) &&
@@ -31,6 +29,7 @@ module.exports = {
   parseWodPdf: function (input, callback) {
     var data = {};
     pdfText(input, function (err, chunks) {
+      moment.locale('da');
       if (err) {
         return callback(err);
       }
@@ -50,7 +49,7 @@ module.exports = {
           }
         }
       });
-
+      moment.locale('en');
       return callback(err, data);
     });
   },
