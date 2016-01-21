@@ -5,8 +5,14 @@ var Botkit = require('botkit'),
 require('moment-range');
 
 if (!process.env.SLACK_API_KEY) {
-    console.log('Error: Specify SLACK_API_KEY in environment');
-    process.exit(1);
+  console.log('Error: Specify SLACK_API_KEY in environment');
+  process.exit(1);
+}
+
+if (!process.env.HEROKU_URL) {
+  console.log('Warning: Running without keepalive');
+} else {
+  utils.keepAlive(process.env.HEROKU_URL);
 }
 
 var controller = Botkit.slackbot(),

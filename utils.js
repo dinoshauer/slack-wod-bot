@@ -1,4 +1,5 @@
 var _ = require('underscore'),
+    express = require('express'),
     moment = require('moment'),
     request = require('request').defaults({ encoding: null }),
     pdfText = require('pdf-text');
@@ -103,5 +104,21 @@ module.exports = {
         return callback(null, res);
       });
     });
+  },
+  keepAlive: function (baseUrl) {
+    var web = express();
+
+    web.get('/ping', function (req, res) {
+      console.log('Responding to PING');
+      res.send('PONG');
+    });
+
+    web.listen(8080, function () {
+      console.log('Web server listening on 8080!');
+    });
+
+    setInterval(function () {
+      request.get(baseUrl + '/ping');
+    }, 60000);
   }
 }

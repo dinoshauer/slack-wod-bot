@@ -10,6 +10,9 @@ respond to requests.
 
 * redis to save the wod list into.
 * `SLACK_API_KEY` environment variable.
+* `HEROKU_URL` (optional) - If supplied an express web server will be created
+  at launch and the bot will ping the webserver every 60 seconds, as to keep
+  itself alive on heroku
 
 ## Currently listening for these patterns:
 
