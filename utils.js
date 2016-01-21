@@ -113,8 +113,8 @@ module.exports = {
       res.send('PONG');
     });
 
-    web.listen(8080, function () {
-      console.log('Web server listening on 8080!');
+    web.listen(process.env.PORT || 8080, function () {
+      console.log('Web server started!');
     });
 
     setInterval(function () {
