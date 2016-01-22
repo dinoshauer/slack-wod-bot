@@ -162,6 +162,27 @@ controller.hears(
 });
 
 controller.hears(
+  ['wod (mon|tues|wednes|thurs|fri|satur|sun)day\??'],
+  ['direct_message', 'direct_mention', 'mention', 'ambient'],
+  function (bot, message) {
+    var start = moment().startOf('day'),
+        target = start.day(message.match[1]).toISOString();
+    console.log(message);
+
+    utils.getWod(target, function (err, res) {
+      if (err) {
+        console.log(err);
+        bot.reply('I couldn\'t get a wod for ' + message.match[1] + 'day :(');
+      }
+      if (res.length !== 0) {
+        bot.reply(message, res.join('\n'));
+      } else {
+        bot.reply(message, 'There are no wods for ' + message.match[1] + 'day in my head :o');
+      }
+    });
+});
+
+controller.hears(
   ['wod next (mon|tues|wednes|thurs|fri|satur|sun)day\??'],
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {

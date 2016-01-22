@@ -21,6 +21,7 @@ respond to requests.
 * `wod today`
 * `wod yesterday`
 * `wod tomorrow`
+* `wod (mon|tues|wednes|thurs|fri|satur|sun)day\??`
 * `wod next (mon|tues|wednes|thurs|fri|satur|sun)day\??`
 * `wods next week\??`
 
