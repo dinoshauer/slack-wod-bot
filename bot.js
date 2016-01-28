@@ -112,7 +112,7 @@ controller.hears(
         bot.reply('I couldn\'t get a wod for today :(');
       }
       if (res.length !== 0) {
-        bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
+        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
       } else {
         bot.reply(message, 'There are no wods for today in my head :o');
       }
@@ -133,7 +133,7 @@ controller.hears(
         bot.reply('I couldn\'t get a wod for tomorrow :(');
       }
       if (res.length !== 0) {
-        bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
+        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
       } else {
         bot.reply(message, 'There are no wods for tomorrow in my head :o');
       }
@@ -154,7 +154,7 @@ controller.hears(
         bot.reply('I couldn\'t get a wod for yesterday :(');
       }
       if (res.length !== 0) {
-        bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
+        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
       } else {
         bot.reply(message, 'There are no wods for yesterday in my head :o');
       }
@@ -175,7 +175,7 @@ controller.hears(
         bot.reply('I couldn\'t get a wod for ' + message.match[1] + 'day :(');
       }
       if (res.length !== 0) {
-        bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
+        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
       } else {
         bot.reply(message, 'There are no wods for ' + message.match[1] + 'day in my head :o');
       }
@@ -196,7 +196,7 @@ controller.hears(
         bot.reply('I couldn\'t get a wod for next ' + message.match[1] + 'day :(');
       }
       if (res.length !== 0) {
-        bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
+        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
       } else {
         bot.reply(message, 'There are no wods for next ' + message.match[1] + 'day in my head :o');
       }
