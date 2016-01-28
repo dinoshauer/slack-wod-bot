@@ -26,11 +26,26 @@ function _isContent(item) {
          !_footer_re.test(item);
 }
 
+function _parseWod (wod) {
+  var pattern = /^[A-Z]\. /,
+      result = {},
+      lastMatch;
+  wod.forEach(function (item, index) {
+    var matches = item.match(pattern);
+    if (matches) {
+      lastMatch = matches[0];
+      result[matches[0]] = [item.replace(pattern, '')]
+    } else if (lastMatch) {
+      result[lastMatch] = result[lastMatch].concat(item);
+    }
+  });
+  return result;
+};
+
 module.exports = {
   parseWodPdf: function (input, callback) {
     var data = {};
     pdfText(input, function (err, chunks) {
-      moment.locale('da');
       if (err) {
         return callback(err);
       }
@@ -38,7 +53,7 @@ module.exports = {
       var key;
       _.forEach(chunks, function(item) {
         if (_isContent(item)) {
-          var date = moment(item);
+          var date = moment(item).locale('da');
           if (date.isValid() && _date_re.test(item)) {
             key = date.toISOString();
             data[key] = [];
@@ -50,7 +65,6 @@ module.exports = {
           }
         }
       });
-      moment.locale('en');
       return callback(err, data);
     });
   },
@@ -120,5 +134,32 @@ module.exports = {
     setInterval(function () {
       request.get(baseUrl + '/ping');
     }, 60000);
+  },
+  presentWod: function (target, wodList) {
+    var wod = _parseWod(wodList),
+        wodStr = 'Wod for ' + target.format('dddd YYYY-MM-DD') + ':\n';
+
+    _.forEach(wod, function (value, key) {
+      wodStr += '*' + key + '*:\n';
+      value.forEach(function (item) {
+        if (item) {
+          wodStr += '  - ' + item + '\n';
+        }
+      });
+    });
+    return wodStr;
+  },
+  replyWithWod: function (target, bot, message, day) {
+    this.getWod(target.toISOString(), function (err, res) {
+      if (err) {
+        console.log(err);
+        bot.reply('I couldn\'t get a wod for ' + day + ' :(');
+      }
+      if (res.length !== 0) {
+        bot.reply(message, this.presentWod(target, res));
+      } else {
+        bot.reply(message, 'There are no wods for ' + day + ' in my head :o');
+      }
+    }.bind(this));
   }
 }

@@ -103,20 +103,9 @@ controller.hears(
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {
     var start = moment().startOf('day'),
-        target = start.toISOString();
+        target = start;
     console.log(message);
-
-    utils.getWod(target, function (err, res) {
-      if (err) {
-        console.log(err);
-        bot.reply('I couldn\'t get a wod for today :(');
-      }
-      if (res.length !== 0) {
-        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
-      } else {
-        bot.reply(message, 'There are no wods for today in my head :o');
-      }
-    });
+    utils.replyWithWod(target, bot, message, 'today');
 });
 
 controller.hears(
@@ -124,20 +113,9 @@ controller.hears(
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {
     var start = moment().startOf('day'),
-        target = start.add(1, 'day').toISOString();
+        target = start.add(1, 'day');
     console.log(message);
-
-    utils.getWod(target, function (err, res) {
-      if (err) {
-        console.log(err);
-        bot.reply('I couldn\'t get a wod for tomorrow :(');
-      }
-      if (res.length !== 0) {
-        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
-      } else {
-        bot.reply(message, 'There are no wods for tomorrow in my head :o');
-      }
-    });
+    utils.replyWithWod(target, bot, message, 'tomorrow');
 });
 
 controller.hears(
@@ -145,62 +123,29 @@ controller.hears(
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {
     var start = moment().startOf('day'),
-        target = start.subtract(1, 'day').toISOString();
+        target = start.subtract(1, 'day');
     console.log(message);
-
-    utils.getWod(target, function (err, res) {
-      if (err) {
-        console.log(err);
-        bot.reply('I couldn\'t get a wod for yesterday :(');
-      }
-      if (res.length !== 0) {
-        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
-      } else {
-        bot.reply(message, 'There are no wods for yesterday in my head :o');
-      }
-    });
+    utils.replyWithWod(target, bot, message, 'yesterday');
 });
 
 controller.hears(
   ['wod (mon|tues|wednes|thurs|fri|satur|sun)day\??'],
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {
-    var start = moment().startOf('day'),
-        target = start.day(message.match[1]).toISOString();
+    var start = moment().startOf('isoWeek'),
+        target = start.day(message.match[1]);
     console.log(message);
-
-    utils.getWod(target, function (err, res) {
-      if (err) {
-        console.log(err);
-        bot.reply('I couldn\'t get a wod for ' + message.match[1] + 'day :(');
-      }
-      if (res.length !== 0) {
-        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
-      } else {
-        bot.reply(message, 'There are no wods for ' + message.match[1] + 'day in my head :o');
-      }
-    });
+    utils.replyWithWod(target, bot, message, message.match[1]);
 });
 
 controller.hears(
   ['wod next (mon|tues|wednes|thurs|fri|satur|sun)day\??'],
   ['direct_message', 'direct_mention', 'mention', 'ambient'],
   function (bot, message) {
-    var start = moment().startOf('day').add(1, 'week'),
-        target = start.day(message.match[1]).toISOString();
+    var start = moment().add(1, 'week').startOf('week'),
+        target = start.day(message.match[1]);
     console.log(message);
-
-    utils.getWod(target, function (err, res) {
-      if (err) {
-        console.log(err);
-        bot.reply('I couldn\'t get a wod for next ' + message.match[1] + 'day :(');
-      }
-      if (res.length !== 0) {
-        bot.reply(message, '*' + target + '*\n' + res.join('\n'));
-      } else {
-        bot.reply(message, 'There are no wods for next ' + message.match[1] + 'day in my head :o');
-      }
-    });
+    utils.replyWithWod(target, bot, message, message.match[1]);
 });
 
 controller.hears(
@@ -214,15 +159,7 @@ controller.hears(
 
     targets.by('days', function (target) {
       utils.getWod(target.toISOString(), function (err, res) {
-        if (err) {
-          console.log(err);
-          bot.reply('I couldn\'t get a wod for next week :(');
-        }
-        if (res.length !== 0) {
-          bot.reply(message, '*' + target.toISOString() + '*\n' + res.join('\n'));
-        } else {
-          bot.reply(message, 'There are no wods for next week in my head :o');
-        }
+        utils.replyWithWod(target, bot, message, 'next ' + target.format('dddd'));
       });
     });
 });
