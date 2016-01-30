@@ -1,4 +1,5 @@
-var express = require('express');
+var express = require('express'),
+    request = require('request');
 
 module.exports = {
   keepAlive: function (baseUrl) {
