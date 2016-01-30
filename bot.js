@@ -1,6 +1,7 @@
 var Botkit = require('botkit'),
     moment = require('moment'),
-    utils = require('./utils');
+    utils = require('./utils'),
+    wod = require('./wod');
 
 require('moment-range');
 
@@ -38,7 +39,7 @@ controller.hears(
           pattern: bot.utterances.yes,
           callback: function(response, convo) {
             convo.say('I won\'t remember a thing!');
-            utils.wipeWodList(function (err, res) {
+            wod.wipeWodList(function (err, res) {
               if (err) {
                 console.log(err);
                 convo.say('I couldn\'t wipe the list :(');
@@ -68,7 +69,7 @@ controller.hears(
   function (bot, message) {
     bot.startConversation(message, function (error, convo) {
       convo.sayFirst('Great! I\'m going to download the list @ ' + message.match[1]);
-      utils.downloadPdf(message.match[1], function (err, res) {
+      wod.downloadPdf(message.match[1], function (err, res) {
         if (err) {
           console.error('error!', err.statusCode);
           convo.say('Something happened when downloading the list :(');
@@ -76,7 +77,7 @@ controller.hears(
         }
         console.log('Downloaded new list', res.statusCode);
         convo.say('List downloaded. Parsing. Meep, morp... Zorp.')
-        utils.parseWodPdf(res.body, function (err, wods) {
+        wod.parseWodPdf(res.body, function (err, wods) {
           if (err) {
             console.error('error!', err);
             convo.say('Something bad happened when parsing the pdf! :<');
@@ -84,7 +85,7 @@ controller.hears(
           }
           console.log('Parsed list');
           convo.say('I totally parsed that list! I\'ll try and save it now');
-          utils.saveWodList(wods, function (err, results) {
+          wod.saveWodList(wods, function (err, results) {
             if (err) {
               console.error('error!', err);
               convo.say('I couldn\'t save the list to memory!');
@@ -105,7 +106,7 @@ controller.hears(
     var start = moment().startOf('day'),
         target = start;
     console.log(message);
-    utils.replyWithWod(target, bot, message, 'today');
+    wod.replyWithWod(target, bot, message, 'today');
 });
 
 controller.hears(
@@ -115,7 +116,7 @@ controller.hears(
     var start = moment().startOf('day'),
         target = start.add(1, 'day');
     console.log(message);
-    utils.replyWithWod(target, bot, message, 'tomorrow');
+    wod.replyWithWod(target, bot, message, 'tomorrow');
 });
 
 controller.hears(
@@ -125,7 +126,7 @@ controller.hears(
     var start = moment().startOf('day'),
         target = start.subtract(1, 'day');
     console.log(message);
-    utils.replyWithWod(target, bot, message, 'yesterday');
+    wod.replyWithWod(target, bot, message, 'yesterday');
 });
 
 controller.hears(
@@ -135,7 +136,7 @@ controller.hears(
     var start = moment().startOf('isoWeek'),
         target = start.day(message.match[1]);
     console.log(message);
-    utils.replyWithWod(target, bot, message, message.match[1]);
+    wod.replyWithWod(target, bot, message, message.match[1]);
 });
 
 controller.hears(
@@ -145,7 +146,7 @@ controller.hears(
     var start = moment().add(1, 'week').startOf('week'),
         target = start.day(message.match[1]);
     console.log(message);
-    utils.replyWithWod(target, bot, message, message.match[1]);
+    wod.replyWithWod(target, bot, message, message.match[1]);
 });
 
 controller.hears(
@@ -158,8 +159,8 @@ controller.hears(
     console.log(message);
 
     targets.by('days', function (target) {
-      utils.getWod(target.toISOString(), function (err, res) {
-        utils.replyWithWod(target, bot, message, 'next ' + target.format('dddd'));
+      wod.getWod(target.toISOString(), function (err, res) {
+        wod.replyWithWod(target, bot, message, 'next ' + target.format('dddd'));
       });
     });
 });
