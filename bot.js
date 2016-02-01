@@ -39,16 +39,15 @@ controller.hears(
           pattern: bot.utterances.yes,
           callback: function(response, convo) {
             convo.say('I won\'t remember a thing!');
-            wod.wipeWodList(function (err, res) {
-              if (err) {
-                console.log(err);
-                convo.say('I couldn\'t wipe the list :(');
-                convo.next();
-              } else {
+            wod.wipeWodList()
+              .then( res => {
                 convo.say('I forgot ' + res + ' WODs... :robot_face:');
                 convo.next();
-              }
-            });
+              })
+              .catch( err => {
+                convo.say('I couldn\'t wipe the list :(');
+                convo.next();
+              });
           }
         },
         {

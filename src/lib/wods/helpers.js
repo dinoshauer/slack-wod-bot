@@ -106,30 +106,28 @@ export const getNewWodList = (link) => (
     })
 );
 
-export const getWod = (key, callback) => {
-  client.zrange('wod:' + key, 0, -1, (err, res) => {
-    if (err) {
-      return callback(err);
-    }
-    return callback(null, res);
+export const getWod = (key) => {
+  return new Promise( (resolve, reject) => {
+    client.zrange('wod:' + key, 0, -1, (err, res) => {
+      return err ? reject(err) : resolve(res);
+    });
   });
 };
 
-export const wipeWodList = (callback) => {
-  client.keys('wod:*', (err, keys) => {
-    if (err) {
-      return callback(err);
-    } else if (keys.length === 0) {
-      return callback(null, 0);
-    }
-    client.del(keys, (err, res) => {
-      if (err) {
-        return callback(err);
-      }
-      console.log(res);
-      return callback(null, res);
+export const wipeWodList = () => {
+  const checkKeys = () => new Promise( (resolve, reject) => {
+    client.keys('wod:*', (err, keys) => {
+      return err ? reject(err) : resolve(keys);
     });
   });
+
+  const delKeys = (keys) => new Promise( (resolve, reject) => {
+    client.del(keys, (err, res) => {
+      return err ? reject(err) : resolve(res);
+    });
+  });
+
+  return checkKeys().then(delKeys);
 };
 
 export const presentWod = (target, wodList) => {
@@ -137,23 +135,22 @@ export const presentWod = (target, wodList) => {
   const targetStr = target.format('dddd YYYY-MM-DD');
   let wodStr = `Wod for ${targetStr}:\n`;
 
-  _.forEach(wod, (value, key) => {
+  Object.keys(wod).forEach( key => {
     wodStr += `*${key}*:\n`;
-    value.forEach((item) => item ? wodStr += `  - ${item}\n` : '');
+    value.forEach( (item) => item ? wodStr += `  - ${item}\n` : '');
   });
+
   return wodStr;
 };
 
 export const replyWithWod = (target, bot, message, day) => {
-  getWod(target.toISOString(), (err, res) => {
-    if (err) {
-      console.log(err);
-      bot.reply(`I couldn\'t get a wod for ${day} :(`);
-    }
-    if (res.length !== 0) {
-      bot.reply(message, this.presentWod(target, res));
-    } else {
-      bot.reply(message, `There are no wods for ${day} in my head :o`);
-    }
-  });
+  getWod(target.toISOString())
+    .then( wod => {
+      if (wod.length !== 0) {
+        bot.reply(message, this.presentWod(target, wod));
+      } else {
+        bot.reply(message, `There are no wods for ${day} in my head :o`);
+      }
+    })
+    .catch( () => bot.reply(`I couldn\'t get a wod for ${day} :(`));
 };
