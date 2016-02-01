@@ -26,10 +26,10 @@ const _getAttendees = ((resId, timestamp) => {
 
 export const getBookings = () => axios(_getOpts('path=GetBookings'))
   .then(( { data } ) => {
-    return Promise.all(data.d.map((booking) => {
+    return Promise.all(data.d.map( booking => {
       const rawTime = _parseTime(booking.StartDateTime);
       return _getAttendees(booking.RessourceId, rawTime)
-        .then((attendees) => {
+        .then( attendees => {
           return {
             name: booking.Name,
             location: booking.CenterName,

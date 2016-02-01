@@ -1,7 +1,7 @@
 var Botkit = require('botkit'),
     moment = require('moment'),
     utils = require('./utils'),
-    wod = require('./wod');
+    wod = require('./src/lib/wods/helpers');
 
 require('moment-range');
 
@@ -69,33 +69,18 @@ controller.hears(
   function (bot, message) {
     bot.startConversation(message, function (error, convo) {
       convo.sayFirst('Great! I\'m going to download the list @ ' + message.match[1]);
-      wod.downloadPdf(message.match[1], function (err, res) {
-        if (err) {
-          console.error('error!', err.statusCode);
+      wod.getNewWodList(message.match[1])
+        .then(response => {
+          console.log('List saved: ', response);
+          convo.say('I saved the new list!');
+          convo.stop();
+        })
+        .catch(err => {
+          throw new Error(err);
+          console.log('Error when downloading pdf', err)
           convo.say('Something happened when downloading the list :(');
           convo.stop();
-        }
-        console.log('Downloaded new list', res.statusCode);
-        convo.say('List downloaded. Parsing. Meep, morp... Zorp.')
-        wod.parseWodPdf(res.body, function (err, wods) {
-          if (err) {
-            console.error('error!', err);
-            convo.say('Something bad happened when parsing the pdf! :<');
-            convo.stop();
-          }
-          console.log('Parsed list');
-          convo.say('I totally parsed that list! I\'ll try and save it now');
-          wod.saveWodList(wods, function (err, results) {
-            if (err) {
-              console.error('error!', err);
-              convo.say('I couldn\'t save the list to memory!');
-              convo.stop();
-            }
-            console.log('List saved.')
-            convo.say('Everything is great! I saved the list!');
-          });
         });
-      });
     });
 });
 
