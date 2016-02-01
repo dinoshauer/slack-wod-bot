@@ -143,8 +143,10 @@ controller.hears(
     console.log(message);
 
     targets.by('days', function (target) {
-      wod.getWod(target.toISOString(), function (err, res) {
-        wod.replyWithWod(target, bot, message, 'next ' + target.format('dddd'));
-      });
+      wod.getWod(target.toISOString())
+        .then( res => {
+          let formattedTarget = target.format('dddd');
+          wod.replyWithWod(target, bot, message, `next ${formattedTarget}`);
+        });
     });
 });

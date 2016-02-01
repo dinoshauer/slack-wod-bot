@@ -63,10 +63,15 @@ const _parseWodPdf = (input) => {
       let key;
       chunks.forEach( item => {
         if (_isContent(item)) {
-          var date = moment(item, 'dddd den DD. MMMM YY').locale('da');
-          if (date.isValid() && _date_re.test(item)) {
-            key = date.toISOString();
-            data[key] = [];
+          if (_date_re.test(item)) {
+            const strippedItem = item.replace(/(.*)dag den\s(.*)/i, '$2');
+            const date = moment(strippedItem, 'D. MMMM YY', 'da', true)
+              .add(1, 'day');
+
+            if (date.isValid()) {
+              key = date.toISOString();
+              data[key] = [];
+            }
           }
           if (data.hasOwnProperty(key)) {
             if (!_date_re.test(item)) {
@@ -107,8 +112,9 @@ export const getNewWodList = (link) => (
 );
 
 export const getWod = (key) => {
+  console.log(`Getting key: wod:${key}`)
   return new Promise( (resolve, reject) => {
-    client.zrange('wod:' + key, 0, -1, (err, res) => {
+    client.zrange(`wod:${key}`, 0, -1, (err, res) => {
       return err ? reject(err) : resolve(res);
     });
   });
@@ -137,17 +143,17 @@ export const presentWod = (target, wodList) => {
 
   Object.keys(wod).forEach( key => {
     wodStr += `*${key}*:\n`;
-    value.forEach( (item) => item ? wodStr += `  - ${item}\n` : '');
+    wod[key].forEach( (item) => item ? wodStr += `  - ${item}\n` : '');
   });
 
   return wodStr;
 };
 
 export const replyWithWod = (target, bot, message, day) => {
-  getWod(target.toISOString())
+  getWod(target.add(1, 'day').toISOString())
     .then( wod => {
       if (wod.length !== 0) {
-        bot.reply(message, this.presentWod(target, wod));
+        bot.reply(message, presentWod(target, wod));
       } else {
         bot.reply(message, `There are no wods for ${day} in my head :o`);
       }
