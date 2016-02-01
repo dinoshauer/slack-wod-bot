@@ -63,7 +63,7 @@ const _parseWodPdf = (input) => {
       let key;
       chunks.forEach( item => {
         if (_isContent(item)) {
-          var date = moment(item).locale('da');
+          var date = moment(item, 'dddd den DD. MMMM YY').locale('da');
           if (date.isValid() && _date_re.test(item)) {
             key = date.toISOString();
             data[key] = [];
