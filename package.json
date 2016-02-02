@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prebuild": "npm install",
-    "build": "babel src/ -d build",
-    "start": "node build/app.js",
+    "prestart": "npm install",
+    "start": "./node_modules/.bin/babel-node bot.js",
     "dev": "nodemon --exec babel-node -- src/app.js"
   },
   "author": "",
