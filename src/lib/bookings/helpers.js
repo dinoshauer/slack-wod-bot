@@ -2,10 +2,12 @@ import request from 'request-promise';
 import axios from 'axios';
 import moment from 'moment';
 
-const _getOpts = ( path => {
-  const cfcSession = process.env.CFC_SESSION;
-  const csrfToken = process.env.CSRF_TOKEN;
-  return {
+const _getOpts = (
+  path,
+  cfcSession = process.env.CFC_SESSION,
+  csrfToken = process.env.CSRF_TOKEN
+) => (
+  {
     url: 'http://www.crossfitcopenhagen.dk/booking_gateway',
     method: 'post',
     headers: {
@@ -16,14 +18,19 @@ const _getOpts = ( path => {
       'Accept': 'application/json, text/javascript, */*; q=0.01',
     },
     data: path
-  };
-});
+  }
+);
 
 const _parseTime = (time) => parseInt(time.replace(/\/Date\((\d+)\)\//, '$1'));
 
-const _getAttendees = ((resId, timestamp) => {
-  return axios(_getOpts(`RessourceId=${resId}&Timestamp=${timestamp}&Duration=3600&path=GetListOfPeopleBooked`));
-});
+const _getAttendees = (
+  resId,
+  timestamp,
+  path = `RessourceId=${resId}&Timestamp=${timestamp}&Duration=3600&path=GetListOfPeopleBooked`
+) => (
+  axios(_getOpts(path))
+    .then( ({ data }) => data.d )
+);
 
 export const getBoxes = () => {
   const path = 'path=jGetCenterAllowedToBook';
@@ -43,7 +50,7 @@ export const getBookings = () => axios(_getOpts('path=GetBookings'))
             duration: moment.duration(booking.Duration, 's'),
             cancelBefore: moment.duration(booking.CancelBookingBefore, 's'),
             capacity: booking.Capacity,
-            attendees: attendees.data.d
+            attendees: attendees
           }
         });
     }));
