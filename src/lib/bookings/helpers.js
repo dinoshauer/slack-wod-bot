@@ -1,6 +1,7 @@
 import request from 'request-promise';
 import axios from 'axios';
 import moment from 'moment';
+import 'moment-range';
 
 const _getOpts = (
   path,
@@ -29,13 +30,67 @@ const _getAttendees = (
   path = `RessourceId=${resId}&Timestamp=${timestamp}&Duration=3600&path=GetListOfPeopleBooked`
 ) => (
   axios(_getOpts(path))
-    .then( ({ data }) => data.d )
+    .then(( { data } ) => data.d )
 );
 
-export const getBoxes = () => {
-  const path = 'path=jGetCenterAllowedToBook';
-  return axios(_getOpts(path));
-}
+export const getBoxes = (path = 'path=jGetCenterAllowedToBook') => (
+  axios(_getOpts(path))
+    .then(( { data } ) => data.d.map(box => (
+      {
+        id: box.Id,
+        name: box.Name
+      }
+    )))
+);
+
+export const getEventsForBox = (
+  boxId,
+  timestamp = moment().format('x'),
+  path = `Timestamp=${timestamp}&CenterID=${boxId}&path=jGetEvents`
+) => (
+  axios(_getOpts(path))
+    .then(({ data }) => {
+      return data.d
+    })
+);
+
+export const _filterEvents = (name, range, events) => (
+  Promise.all(
+    events.filter( event => {
+      const startTime = moment(_parseTime(event.StartDateTime));
+      const title = event.Title.toLowerCase();
+      return title.includes(name) && startTime.within(range);
+    })
+  )
+);
+
+export const _parseEvent = (event, box) => (
+  {
+    title: event.Title,
+    capacity: event.Capacity,
+    freeSpace: event.FreeSpace,
+    box: box.name,
+    startTime: moment(_parseTime(event.StartDateTime)),
+  }
+);
+
+export const getOpenSpotsForDay = (
+  name,
+  range,
+  boxes,
+  timestamp = moment().format('x')
+) => (
+  Promise.all(boxes.map( box => (
+    getEventsForBox(box.id, timestamp)
+      .then( events => _filterEvents(name, range, events))
+      .then( events => events.map(event => _parseEvent(event, box)))
+  )))
+  /*getBoxes()
+    .then( allBoxes => allBoxes.filter( box => boxIds.includes(box.id)))
+    .then( boxes => {
+
+    })*/
+);
 
 export const getBookings = () => axios(_getOpts('path=GetBookings'))
   .then(( { data } ) => {
