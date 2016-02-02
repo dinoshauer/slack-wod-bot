@@ -1,7 +1,8 @@
+import request from 'request-promise';
 import axios from 'axios';
 import moment from 'moment';
 
-const _getOpts = ((path) => {
+const _getOpts = ( path => {
   const cfcSession = process.env.CFC_SESSION;
   const csrfToken = process.env.CSRF_TOKEN;
   return {
@@ -23,6 +24,11 @@ const _parseTime = (time) => parseInt(time.replace(/\/Date\((\d+)\)\//, '$1'));
 const _getAttendees = ((resId, timestamp) => {
   return axios(_getOpts(`RessourceId=${resId}&Timestamp=${timestamp}&Duration=3600&path=GetListOfPeopleBooked`));
 });
+
+export const getBoxes = () => {
+  const path = 'path=jGetCenterAllowedToBook';
+  return axios(_getOpts(path));
+}
 
 export const getBookings = () => axios(_getOpts('path=GetBookings'))
   .then(( { data } ) => {

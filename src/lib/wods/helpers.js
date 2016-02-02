@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import moment from 'moment';
-import request from 'request-promise';
+import axios from 'axios';
 import pdfText from 'pdf-text';
 import url from 'url';
 import { createClient } from 'redis';
@@ -48,15 +48,15 @@ const _parseWod = (wod) => {
   return result;
 };
 
-const _downloadPdf = (link) => request({
+const _downloadPdf = (link) => axios({
   url: link,
-  encoding: null
+  responseType: 'arraybuffer'
 });
 
 const _parseWodPdf = (input) => {
   return new Promise( (resolve, reject) => {
     let data = {};
-    pdfText(input, (err, chunks) => {
+    pdfText(input.data, (err, chunks) => {
       if (err) {
         reject(err);
       }
