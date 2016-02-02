@@ -1,4 +1,3 @@
-import request from 'request-promise';
 import axios from 'axios';
 import moment from 'moment';
 import 'moment-range';
