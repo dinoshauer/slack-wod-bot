@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "npm install",
+    "prestart": "npm install && npm install --only=dev",
     "start": "./node_modules/.bin/babel-node bot.js",
     "dev": "nodemon --exec babel-node -- src/app.js"
   },
