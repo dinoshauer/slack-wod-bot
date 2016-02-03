@@ -16,6 +16,8 @@ respond to requests.
 
 ## Currently listening for these patterns:
 
+### Wods
+
 * `new wod list here: <(.*)>`
 * `wipe wod list`
 * `wod today`
@@ -25,10 +27,14 @@ respond to requests.
 * `wod next (mon|tues|wednes|thurs|fri|satur|sun)day\??`
 * `wods next week\??`
 
+### Booking
+
+* `/(\w*) in (.+) (tomorrow|.*day) (?:(\d+)-(\d+))/`
+
 ## Todo:
 
-* ES6
-* DRYer replies
+* [ ] ES6
+* [x] DRYer replies
 
 [0]: http://howdy.ai/botkit/
 [1]: http://crossfitcopenhagen.dk

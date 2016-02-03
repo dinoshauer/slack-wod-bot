@@ -30,7 +30,7 @@ bot.startRTM(function (err, bot, payload) {
 
 controller.hears(
   [/(\w*) in (.+) (tomorrow|.*day) (?:(\d+)-(\d+))/],
-  ['direct_message', 'direct_mention', 'mention'],
+  ['direct_message', 'direct_mention', 'mention', 'ambient'],
   (bot, message) => {
     console.log(message);
     bot.reply(message, 'Let\'s see...');
@@ -74,7 +74,7 @@ controller.hears(
         events.forEach( event => {
           const { title, capacity, freeSpace, box, startTime } = event;
           const formattedTime = startTime.format('dddd YYYY-MM-DD');
-          payload += `${title}: *${freeSpace}/${capacity}* @${box} starting on ${formattedTime}\n`
+          payload += `${title}: *${freeSpace}/${capacity}* @ ${box} starting on ${formattedTime}\n`
         });
         bot.reply(message, payload);
       })
